@@ -340,12 +340,12 @@ namespace CryptoNote
 
     // P2P Network Configuration Section - This defines our current P2P network version
     // and the minimum version for communication between nodes
-    const uint8_t P2P_CURRENT_VERSION = 13;
+    const uint8_t P2P_CURRENT_VERSION = 14;
 
-    const uint8_t P2P_MINIMUM_VERSION = 12;
+    const uint8_t P2P_MINIMUM_VERSION = 13;
 
     // This defines the minimum P2P version required for lite blocks propogation
-    const uint8_t P2P_LITE_BLOCKS_PROPOGATION_VERSION = 4;
+    const uint8_t P2P_LITE_BLOCKS_PROPOGATION_VERSION = 13;
 
     // This defines the number of versions ahead we must see peers before we start displaying
     // warning messages that we need to upgrade our software.
@@ -384,9 +384,10 @@ namespace CryptoNote
         {0xc6, 0x1c, 0x4d, 0x6c, 0xcc, 0x12, 0x42, 0x9c, 0x33, 0xd6, 0x35, 0xa5, 0xee, 0xc1, 0x43, 0xd8}};
 
     const char *const SEED_NODES[] = {
-        "138.124.183.11:21688",
- 	"185.74.222.212:21688",
-	"superblockchain.con-ip.com:21688", 
-        "superblockchain.zapto.org:21688",
+        "138.124.183.11:21688", /// USA
+ 	"185.74.222.212:21688", // Hong Kong
+        "seedpro1.zent.cash:21688", // seedpro1.zent.cash
+        "seedpro2.zent.cash:21688", // seedpro2.zent.cash
+        "seedpro3.zent.cash:21688", // seedpro3.zent.cash
     };
 } // namespace CryptoNote
