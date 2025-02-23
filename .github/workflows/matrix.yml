@@ -329,10 +329,10 @@ jobs:
 
   macos_build:
     name: macOS
-    runs-on: macos-12
+    runs-on: macos-13
     env:
-      CC: /usr/local/opt/llvm@14/bin/clang
-      CXX: /usr/local/opt/llvm@14/bin/clang++
+      CC: /usr/local/opt/llvm@15/bin/clang
+      CXX: /usr/local/opt/llvm@15/bin/clang++
       LABEL: osx
       CCACHE_DIR: $GITHUB_WORKSPACE/.ccache
     steps:
@@ -341,10 +341,10 @@ jobs:
       # Fetch Dependencies
       - name: Dependencies
         run: |
-           brew install --force boost llvm@14 ccache
-           brew reinstall llvm@14
-           brew link --overwrite llvm@14
-           ln -s /usr/local/opt/llvm@14 /usr/local/opt/llvm
+           brew install --force boost llvm@15 ccache
+           brew reinstall llvm@15
+           brew link --overwrite llvm@15
+           ln -s /usr/local/opt/llvm@15 /usr/local/opt/llvm
       - name: Retrieve ccache
         uses: actions/cache@v4
         with:
