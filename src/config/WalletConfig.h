@@ -77,10 +77,10 @@ namespace WalletConfig
      * Further note: Currently blocks request are not decreased if this is
      * exceeded. Needs to be implemented in future?
      */
-    const size_t maxBodyResponseSize = 1024 * 1024 * 10;
+    const size_t maxBodyResponseSize = 1024 * 1024 * 100;
 
     /**
      * The amount of memory to use storing downloaded blocks - 50MB
      */
-    const size_t blockStoreMemoryLimit = 1024 * 1024 * 50;
+    const size_t blockStoreMemoryLimit = 1024 * 1024 * 500;
 } // namespace WalletConfig
