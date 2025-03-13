@@ -9,9 +9,7 @@ env:
   TAG: ${{ github.ref }}
 
 jobs:
-  # Common Build matrix for builds on Ubuntu VM
-  
-  # Common Build matrix for builds on Ubuntu Lasted VM       
+  # Common Build matrix for builds on Ubuntu VM    
   ubuntu_22_build:
     name: ${{ matrix.build_name }}
     runs-on: ubuntu-22.04
