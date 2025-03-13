@@ -426,17 +426,17 @@ jobs:
       # Install boost
       - name: Install Boost 1.78.0
         run: |
-          $link = "https://boost.teeks99.com/bin/1.78.0/boost_1_78_0-msvc-14.2-64.exe"
+          $link = "https://boost.teeks99.com/bin/1.87.0/boost_1_87_0-msvc-14.2-64.exe"
           $path = "C:\boost.exe"
           [Net.WebClient]::new().DownloadFile($link, $path)
-          Start-Process C:\boost.exe -ArgumentList "/DIR=C:\local\boost_1_78_0","/VERYSILENT" -Wait
-          Get-ChildItem C:\local\boost_1_78_0
+          Start-Process C:\boost.exe -ArgumentList "/DIR=C:\local\boost_1_87_0","/VERYSILENT" -Wait
+          Get-ChildItem C:\local\boost_1_87_0
       # Configure project with cmake
       - name: Configure
         run: |
           mkdir build
           cd build
-          cmake -G "Visual Studio 16 2019" -A x64 .. -DARCH=default -DBOOST_ROOT=C:/local/boost_1_78_0
+          cmake -G "Visual Studio 16 2019" -A x64 .. -DARCH=default -DBOOST_ROOT=C:/local/boost_1_87_0
       # Build for Windows
       - name: Build
         run: |
