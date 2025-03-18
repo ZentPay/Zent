@@ -323,7 +323,7 @@ jobs:
           $env:CLCACHE_DIR = "$env:GITHUB_WORKSPACE\clcache"
           $env:PATH = "$env:PATH;$env:MSBUILD_PATH"
           cd build
-          MSBuild ZentCash.sln /p:Configuration=Release /p:PlatformToolset=v142 /m
+          MSBuild ZentCash.sln /p:Configuration=Debug /p:PlatformToolset=v142 /m
       # Test the crypto
       - name: Test Crypto
         shell: bash
