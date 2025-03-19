@@ -316,14 +316,14 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G "Visual Studio 17 2022" -A x64 .. -DARCH=default -DBOOST_ROOT=C:/local/boost_1_87_0 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="/MTd"
+          cmake -G "Visual Studio 17 2022" -A x64 .. -DARCH=default -DBOOST_ROOT=C:/local/boost_1_87_0
       # Build for Windows
       - name: Build
         run: |
           $env:CLCACHE_DIR = "$env:GITHUB_WORKSPACE\clcache"
           $env:PATH = "$env:PATH;$env:MSBUILD_PATH"
           cd build
-          MSBuild ZentCash.sln /p:Configuration=Debug /p:PlatformToolset=v142 /m
+          MSBuild ZentCash.sln /p:Configuration=Release /p:PlatformToolset=v142 /m
       # Test the crypto
       - name: Test Crypto
         shell: bash
