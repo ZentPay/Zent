@@ -54,12 +54,12 @@ set(CMAKE_SUPPRESS_REGENERATION ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Enable c++17
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 ## This section is for settings found in the slow-hash routine(s) that may benefit some systems (mostly ARM)
-set(FORCE_USE_HEAP ON CACHE BOOL "Force the use of heap memory allocation")
+set(FORCE_USE_HEAP OFF CACHE BOOL "Force the use of heap memory allocation")
 set(NO_AES OFF CACHE BOOL "Turn off Hardware AES instructions?")
 set(NO_OPTIMIZED_MULTIPLY_ON_ARM OFF CACHE BOOL "Turn off Optimized Multiplication on ARM?")
 
