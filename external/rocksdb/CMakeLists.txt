@@ -1421,46 +1421,6 @@ if(WITH_TESTS)
   endif()
 endif()
 
-if(WITH_BENCHMARK_TOOLS)
-  add_executable(db_bench${ARTIFACT_SUFFIX}
-    tools/simulated_hybrid_file_system.cc
-    tools/db_bench.cc
-    tools/db_bench_tool.cc)
-  target_link_libraries(db_bench${ARTIFACT_SUFFIX}
-    ${ROCKSDB_LIB} ${THIRDPARTY_LIBS})
-
-  add_executable(cache_bench${ARTIFACT_SUFFIX}
-    cache/cache_bench.cc
-    cache/cache_bench_tool.cc)
-  target_link_libraries(cache_bench${ARTIFACT_SUFFIX}
-    ${ROCKSDB_LIB} ${GFLAGS_LIB})
-
-  add_executable(memtablerep_bench${ARTIFACT_SUFFIX}
-    memtable/memtablerep_bench.cc)
-  target_link_libraries(memtablerep_bench${ARTIFACT_SUFFIX}
-    ${ROCKSDB_LIB} ${GFLAGS_LIB})
-
-  add_executable(range_del_aggregator_bench${ARTIFACT_SUFFIX}
-    db/range_del_aggregator_bench.cc)
-  target_link_libraries(range_del_aggregator_bench${ARTIFACT_SUFFIX}
-    ${ROCKSDB_LIB} ${GFLAGS_LIB})
-
-  add_executable(table_reader_bench${ARTIFACT_SUFFIX}
-    table/table_reader_bench.cc)
-  target_link_libraries(table_reader_bench${ARTIFACT_SUFFIX}
-    ${ROCKSDB_LIB} testharness ${GFLAGS_LIB})
-
-  add_executable(filter_bench${ARTIFACT_SUFFIX}
-    util/filter_bench.cc)
-  target_link_libraries(filter_bench${ARTIFACT_SUFFIX}
-    ${ROCKSDB_LIB} ${GFLAGS_LIB})
-
-  add_executable(hash_table_bench${ARTIFACT_SUFFIX}
-    utilities/persistent_cache/hash_table_bench.cc)
-  target_link_libraries(hash_table_bench${ARTIFACT_SUFFIX}
-    ${ROCKSDB_LIB} ${GFLAGS_LIB})
-endif()
-
 if(WITH_CORE_TOOLS OR WITH_TOOLS)
   add_subdirectory(tools)
   add_custom_target(core_tools
