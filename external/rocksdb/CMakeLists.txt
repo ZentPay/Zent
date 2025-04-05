@@ -1421,18 +1421,6 @@ if(WITH_TESTS)
   endif()
 endif()
 
-if(WITH_CORE_TOOLS OR WITH_TOOLS)
-  add_subdirectory(tools)
-  add_custom_target(core_tools
-    DEPENDS ${core_tool_deps})
-endif()
-
-if(WITH_TOOLS)
-  add_subdirectory(db_stress_tool)
-  add_custom_target(tools
-    DEPENDS ${tool_deps})
-endif()
-
 option(WITH_EXAMPLES "build with examples" OFF)
 if(WITH_EXAMPLES)
   add_subdirectory(examples)
