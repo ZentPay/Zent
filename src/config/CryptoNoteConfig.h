@@ -349,7 +349,7 @@ namespace CryptoNote
 
     // This defines the number of versions ahead we must see peers before we start displaying
     // warning messages that we need to upgrade our software.
-    const uint8_t P2P_UPGRADE_WINDOW = 13;
+    const uint8_t P2P_UPGRADE_WINDOW = 1;
 
     const size_t P2P_CONNECTION_MAX_WRITE_BUFFER_SIZE = 32 * 1024 * 1024; // 32 MB
     const uint32_t P2P_DEFAULT_CONNECTIONS_COUNT = 8;
@@ -366,8 +366,8 @@ namespace CryptoNote
     const size_t P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT = 5000; // 5 seconds
     const char P2P_STAT_TRUSTED_PUB_KEY[] = "";
 
-    const uint64_t ROCKSDB_WRITE_BUFFER_MB = 256; // 256 MB
-    const uint64_t ROCKSDB_READ_BUFFER_MB = 128; // 128 MB
+    const uint64_t ROCKSDB_WRITE_BUFFER_MB = 512; // 512 MB
+    const uint64_t ROCKSDB_READ_BUFFER_MB = 256; // 256 MB
     const uint64_t ROCKSDB_MAX_OPEN_FILES = 125; // 125 files
     const uint64_t ROCKSDB_BACKGROUND_THREADS = 4; // 4 DB threads
 
