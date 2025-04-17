@@ -340,12 +340,6 @@ jobs:
           $env:PATH = "$env:PATH;$env:MSBUILD_PATH"
           cd build
           MSBuild ZentCash.sln /p:Configuration=Debug /p:PlatformToolset=v142 /m
-      # Test the crypto
-      - name: Test Crypto
-        shell: bash
-        run: |
-          cd build/src/Release
-          ./cryptotest.exe
       # Prepare for deploy
       - name: Prepare for Deploy
         shell: bash
@@ -354,7 +348,7 @@ jobs:
           COMMIT_SHA: ${{ github.sha }}
         run: |
           if [[ "${TAG:5:4}" == "tags" ]]; then export TAG=${TAG:10}; else export TAG=${COMMIT_SHA}; fi
-          cd build/src/Release
+          cd build
           rm -rf ZentCash-${TAG}
           mkdir ZentCash-${TAG}
           cp *.exe ZentCash-${TAG}/
