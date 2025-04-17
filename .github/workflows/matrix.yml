@@ -348,10 +348,9 @@ jobs:
           COMMIT_SHA: ${{ github.sha }}
         run: |
           if [[ "${TAG:5:4}" == "tags" ]]; then export TAG=${TAG:10}; else export TAG=${COMMIT_SHA}; fi
-          cd build
           rm -rf ZentCash-${TAG}
           mkdir ZentCash-${TAG}
-          cp -r * ZentCash-${TAG}/
+          cp -r build/* ZentCash-${TAG}/
           7z a ZentCash-${TAG}-${LABEL}.zip ZentCash-${TAG}/
 
       # Upload to GH Release
@@ -362,7 +361,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./build/src/Release/ZentCash-${{ github.event.release.tag_name }}-${{ env.LABEL }}.zip
+          asset_path: ./ZentCash-${{ github.event.release.tag_name }}-${{ env.LABEL }}.zip
           asset_name: ZentCash-${{ github.event.release.tag_name }}-${{ env.LABEL }}.zip
           asset_content_type: application/zip
 
@@ -371,4 +370,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ZentCash-${{ github.sha }}-${{ env.LABEL }}
-          path: ./build/src/Release/ZentCash-${{ github.sha }}
+          path: ./ZentCash-${{ github.sha }}
