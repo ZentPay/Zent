@@ -226,8 +226,7 @@ bool ValidateTransaction::validateTransactionInputs()
             {
                 setTransactionValidationResult(
                     CryptoNote::error::TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT,
-                    "Transaction contains key image that has already been spent"
-                );
+                    "Transaction contains key image that has already been spent" + std::to_string(m_blockHeight) + ": " + Common::podToHex(in.keyImage));
 
                 return false;
             }
@@ -503,8 +502,7 @@ bool ValidateTransaction::validateTransactionInputsExpensive()
             {
                 setTransactionValidationResult(
                     CryptoNote::error::TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT,
-                    "Transaction contains key image that has already been spent"
-                );
+                    "Transaction contains key image that has already been spent" + std::to_string(m_blockHeight) + ": " + Common::podToHex(in.keyImage));
 
                 return false;
             }
