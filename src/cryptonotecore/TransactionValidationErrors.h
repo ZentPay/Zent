@@ -86,7 +86,7 @@ namespace CryptoNote
                     case TransactionValidationError::INPUT_IDENTICAL_OUTPUT_INDEXES:
                         return "Transaction has identical output indexes";
                     case TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT:
-                        return "Transaction contains an input which has already been spent";
+                        return "Transaction contains an input which has already been spent" + std::to_string(m_blockHeight) + ": " + Common::podToHex(in.keyImage));
                     case TransactionValidationError::INPUT_INVALID_GLOBAL_INDEX:
                         return "Transaction has input with invalid global index";
                     case TransactionValidationError::INPUT_SPEND_LOCKED_OUT:
