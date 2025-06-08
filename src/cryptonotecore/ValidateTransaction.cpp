@@ -10,6 +10,7 @@
 #include <cryptonotecore/TransactionValidationErrors.h>
 #include <cryptonotecore/ValidateTransaction.h>
 #include <utilities/Utilities.h>
+#include <common/StringTools.h> 
 
 ValidateTransaction::ValidateTransaction(
     const CryptoNote::CachedTransaction &cachedTransaction,
