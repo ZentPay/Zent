@@ -8,6 +8,8 @@
 
 #include <string>
 #include <system_error>
+#include <unordered_map>
+#include <mutex>
 
 namespace CryptoNote
 {
@@ -49,7 +51,16 @@ namespace CryptoNote
             MINER_OUTPUT_NOT_CLAIMED
         };
 
-        // custom category:
+        // Structure to hold contextual information for errors
+        struct ErrorContext
+        {
+            uint64_t blockHeight = 0;
+            std::string transactionHash;
+            std::string keyImage;
+            std::string additionalInfo;
+        };
+
+        // Enhanced error category with context support
         class TransactionValidationErrorCategory : public std::error_category
         {
           public:
@@ -65,10 +76,46 @@ namespace CryptoNote
                 return std::error_condition(ev, *this);
             }
 
+            // Method to set context for an error
+            void setErrorContext(int errorCode, const ErrorContext& context)
+            {
+                std::lock_guard<std::mutex> lock(contextMutex_);
+                errorContexts_[errorCode] = context;
+            }
+
             virtual std::string message(int ev) const
             {
                 TransactionValidationError code = static_cast<TransactionValidationError>(ev);
+                std::string baseMessage = getBaseMessage(code);
+                
+                // Try to get context for enhanced message
+                std::lock_guard<std::mutex> lock(contextMutex_);
+                auto it = errorContexts_.find(ev);
+                if (it != errorContexts_.end() && code == TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT)
+                {
+                    const ErrorContext& ctx = it->second;
+                    if (!ctx.keyImage.empty())
+                    {
+                        baseMessage += " - Block height: " + std::to_string(ctx.blockHeight) + 
+                                      ", Key image: " + ctx.keyImage;
+                        if (!ctx.transactionHash.empty())
+                        {
+                            baseMessage += ", Transaction hash: " + ctx.transactionHash;
+                        }
+                    }
+                }
+                
+                return baseMessage;
+            }
 
+          private:
+            mutable std::mutex contextMutex_;
+            mutable std::unordered_map<int, ErrorContext> errorContexts_;
+
+            TransactionValidationErrorCategory() {}
+
+            std::string getBaseMessage(TransactionValidationError code) const
+            {
                 switch (code)
                 {
                     case TransactionValidationError::VALIDATION_SUCCESS:
@@ -85,6 +132,8 @@ namespace CryptoNote
                         return "Transaction has identical key images";
                     case TransactionValidationError::INPUT_IDENTICAL_OUTPUT_INDEXES:
                         return "Transaction has identical output indexes";
+                    case TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT:
+                        return "Transaction contains an input which has already been spent";
                     case TransactionValidationError::INPUT_INVALID_GLOBAL_INDEX:
                         return "Transaction has input with invalid global index";
                     case TransactionValidationError::INPUT_SPEND_LOCKED_OUT:
@@ -137,10 +186,20 @@ namespace CryptoNote
                         return "Unknown error";
                 }
             }
-
-          private:
-            TransactionValidationErrorCategory() {}
         };
+
+        // Helper function to create error with context
+        inline std::error_code make_error_code_with_context(
+            CryptoNote::error::TransactionValidationError e, 
+            const ErrorContext& context = {})
+        {
+            int errorValue = static_cast<int>(e);
+            if (!context.keyImage.empty() || context.blockHeight > 0)
+            {
+                TransactionValidationErrorCategory::INSTANCE.setErrorContext(errorValue, context);
+            }
+            return std::error_code(errorValue, TransactionValidationErrorCategory::INSTANCE);
+        }
 
         inline std::error_code make_error_code(CryptoNote::error::TransactionValidationError e)
         {
@@ -156,5 +215,4 @@ namespace std
     template<> struct is_error_code_enum<CryptoNote::error::TransactionValidationError> : public true_type
     {
     };
-
 } // namespace std
