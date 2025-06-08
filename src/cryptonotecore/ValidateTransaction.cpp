@@ -224,10 +224,15 @@ bool ValidateTransaction::validateTransactionInputs()
 
             if (!m_validatorState.spentKeyImages.insert(in.keyImage).second)
             {
+                std::string detailedMessage = "Transaction contains an input which has already been spent - " +
+                                             std::string("Block height: ") + std::to_string(m_blockHeight) + ", " +
+                                             "Key image: " + Common::podToHex(in.keyImage);
+                
                 setTransactionValidationResult(
                     CryptoNote::error::TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT,
-                    "Transaction contains key image that has already been spent" + std::to_string(m_blockHeight) + ": " + Common::podToHex(in.keyImage));
-
+                    detailedMessage
+                );
+            
                 return false;
             }
         }
@@ -500,10 +505,15 @@ bool ValidateTransaction::validateTransactionInputsExpensive()
             }
             if (m_blockchainCache->checkIfSpent(in.keyImage, m_blockHeight))
             {
+                std::string detailedMessage = "Transaction contains an input which has already been spent - " +
+                                             std::string("Block height: ") + std::to_string(m_blockHeight) + ", " +
+                                             "Key image: " + Common::podToHex(in.keyImage);
+                
                 setTransactionValidationResult(
                     CryptoNote::error::TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT,
-                    "Transaction contains key image that has already been spent" + std::to_string(m_blockHeight) + ": " + Common::podToHex(in.keyImage));
-
+                    detailedMessage
+                );
+            
                 return false;
             }
 
