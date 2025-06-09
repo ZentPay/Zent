@@ -94,7 +94,7 @@ namespace CryptoNote
                     const ErrorContext& ctx = it->second;
                     if (!ctx.keyImage.empty())
                     {
-                        baseMessage += "Key image: " + ctx.keyImage;
+                        baseMessage += " - Key image: " + ctx.keyImage;
                     }
                 }
                 
