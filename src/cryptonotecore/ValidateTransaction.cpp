@@ -227,9 +227,7 @@ bool ValidateTransaction::validateTransactionInputs()
             {
                 // Create error context with detailed information
                 CryptoNote::error::ErrorContext context;
-                context.blockHeight = m_blockHeight;
                 context.keyImage = Common::podToHex(in.keyImage);
-                context.transactionHash = Common::podToHex(m_cachedTransaction.getTransactionHash());
                 
                 // Use the context-aware error creation
                 m_validationResult.errorCode = CryptoNote::error::make_error_code_with_context(
@@ -513,9 +511,7 @@ bool ValidateTransaction::validateTransactionInputsExpensive()
         {
             // Create error context with detailed information
             CryptoNote::error::ErrorContext context;
-            context.blockHeight = m_blockHeight;
             context.keyImage = Common::podToHex(in.keyImage);
-            context.transactionHash = Common::podToHex(m_cachedTransaction.getTransactionHash());
             
             // Use the context-aware error creation
             std::error_code errorCode = CryptoNote::error::make_error_code_with_context(
