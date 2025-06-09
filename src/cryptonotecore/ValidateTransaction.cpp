@@ -624,6 +624,3 @@ void ValidateTransaction::setTransactionValidationResult(const std::error_code &
         m_validationResult.errorMessage = error_message;
     }
 }
-
-    m_validationResult.errorMessage = error_message;
-}
