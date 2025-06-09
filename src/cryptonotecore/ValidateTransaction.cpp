@@ -155,25 +155,6 @@ bool ValidateTransaction::validateTransactionInputs()
         return false;
     }
 
-    if (!m_validatorState.spentKeyImages.insert(in.keyImage).second)
-    {
-        // Create error context with detailed information
-        CryptoNote::error::ErrorContext context;
-        context.blockHeight = m_blockHeight;
-        context.keyImage = Common::podToHex(in.keyImage);
-        context.transactionHash = Common::podToHex(m_cachedTransaction.getTransactionHash());
-        
-        // Use the context-aware error creation
-        m_validationResult.errorCode = CryptoNote::error::make_error_code_with_context(
-            CryptoNote::error::TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT,
-            context
-        );
-        
-        m_validationResult.errorMessage = m_validationResult.errorCode.message();
-        
-        return false;
-    }
-
     static const Crypto::KeyImage Z = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
@@ -244,15 +225,20 @@ bool ValidateTransaction::validateTransactionInputs()
 
             if (!m_validatorState.spentKeyImages.insert(in.keyImage).second)
             {
-                std::string detailedMessage = "Transaction contains an input which has already been spent - " +
-                                             std::string("Block height: ") + std::to_string(m_blockHeight) + ", " +
-                                             "Key image: " + Common::podToHex(in.keyImage);
+                // Create error context with detailed information
+                CryptoNote::error::ErrorContext context;
+                context.blockHeight = m_blockHeight;
+                context.keyImage = Common::podToHex(in.keyImage);
+                context.transactionHash = Common::podToHex(m_cachedTransaction.getTransactionHash());
                 
-                setTransactionValidationResult(
+                // Use the context-aware error creation
+                m_validationResult.errorCode = CryptoNote::error::make_error_code_with_context(
                     CryptoNote::error::TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT,
-                    detailedMessage
+                    context
                 );
-            
+                
+                m_validationResult.errorMessage = m_validationResult.errorCode.message();
+                
                 return false;
             }
         }
@@ -625,8 +611,19 @@ bool ValidateTransaction::validateTransactionInputsExpensive()
 void ValidateTransaction::setTransactionValidationResult(const std::error_code &error_code, const std::string &error_message)
 {
     std::scoped_lock<std::mutex> lock(m_mutex);
-
+    
     m_validationResult.errorCode = error_code;
+    
+    // Use the error code's message if no custom message provided, or if it's empty
+    if (error_message.empty())
+    {
+        m_validationResult.errorMessage = error_code.message();
+    }
+    else
+    {
+        m_validationResult.errorMessage = error_message;
+    }
+}
 
     m_validationResult.errorMessage = error_message;
 }
