@@ -187,7 +187,7 @@ namespace CryptoNote
             const ErrorContext& context = {})
         {
             int errorValue = static_cast<int>(e);
-            if (!context.keyImage.empty() || context.blockHeight > 0)
+            if (!context.keyImage.empty())
             {
                 TransactionValidationErrorCategory::INSTANCE.setErrorContext(errorValue, context);
             }
