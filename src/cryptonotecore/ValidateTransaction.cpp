@@ -155,6 +155,25 @@ bool ValidateTransaction::validateTransactionInputs()
         return false;
     }
 
+    if (!m_validatorState.spentKeyImages.insert(in.keyImage).second)
+    {
+        // Create error context with detailed information
+        CryptoNote::error::ErrorContext context;
+        context.blockHeight = m_blockHeight;
+        context.keyImage = Common::podToHex(in.keyImage);
+        context.transactionHash = Common::podToHex(m_cachedTransaction.getTransactionHash());
+        
+        // Use the context-aware error creation
+        m_validationResult.errorCode = CryptoNote::error::make_error_code_with_context(
+            CryptoNote::error::TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT,
+            context
+        );
+        
+        m_validationResult.errorMessage = m_validationResult.errorCode.message();
+        
+        return false;
+    }
+
     static const Crypto::KeyImage Z = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
@@ -498,25 +517,30 @@ bool ValidateTransaction::validateTransactionInputsExpensive()
     for (const auto &input : m_transaction.inputs)
     {
         /* Validate each input on a separate thread in our thread pool */
-        validationResult.push_back(m_threadPool.addJob([inputIndex, &input, &prefixHash, &cancelValidation, this] {
-            const CryptoNote::KeyInput &in = boost::get<CryptoNote::KeyInput>(input);
-            if (cancelValidation)
-            {
-                return false; // fail the validation immediately if cancel requested
-            }
-            if (m_blockchainCache->checkIfSpent(in.keyImage, m_blockHeight))
-            {
-                std::string detailedMessage = "Transaction contains an input which has already been spent - " +
-                                             std::string("Block height: ") + std::to_string(m_blockHeight) + ", " +
-                                             "Key image: " + Common::podToHex(in.keyImage);
-                
-                setTransactionValidationResult(
-                    CryptoNote::error::TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT,
-                    detailedMessage
-                );
+    validationResult.push_back(m_threadPool.addJob([inputIndex, &input, &prefixHash, &cancelValidation, this] {
+        const CryptoNote::KeyInput &in = boost::get<CryptoNote::KeyInput>(input);
+        if (cancelValidation)
+        {
+            return false;
+        }
+        if (m_blockchainCache->checkIfSpent(in.keyImage, m_blockHeight))
+        {
+            // Create error context with detailed information
+            CryptoNote::error::ErrorContext context;
+            context.blockHeight = m_blockHeight;
+            context.keyImage = Common::podToHex(in.keyImage);
+            context.transactionHash = Common::podToHex(m_cachedTransaction.getTransactionHash());
             
-                return false;
-            }
+            // Use the context-aware error creation
+            std::error_code errorCode = CryptoNote::error::make_error_code_with_context(
+                CryptoNote::error::TransactionValidationError::INPUT_KEYIMAGE_ALREADY_SPENT,
+                context
+            );
+            
+            setTransactionValidationResult(errorCode, errorCode.message());
+            
+            return false;
+        }
 
             std::vector<Crypto::PublicKey> outputKeys;
             std::vector<uint32_t> globalIndexes(in.outputIndexes.size());
