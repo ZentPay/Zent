@@ -54,8 +54,6 @@ namespace CryptoNote
         // Structure to hold contextual information for errors
         struct ErrorContext
         {
-            uint64_t blockHeight = 0;
-            std::string transactionHash;
             std::string keyImage;
             std::string additionalInfo;
         };
@@ -96,12 +94,7 @@ namespace CryptoNote
                     const ErrorContext& ctx = it->second;
                     if (!ctx.keyImage.empty())
                     {
-                        baseMessage += " - Block height: " + std::to_string(ctx.blockHeight) + 
-                                      ", Key image: " + ctx.keyImage;
-                        if (!ctx.transactionHash.empty())
-                        {
-                            baseMessage += ", Transaction hash: " + ctx.transactionHash;
-                        }
+                        baseMessage += "Key image: " + ctx.keyImage;
                     }
                 }
                 
