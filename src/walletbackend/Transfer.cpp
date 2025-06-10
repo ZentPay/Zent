@@ -41,7 +41,7 @@ namespace SendTransaction
                     Crypto::KeyImage keyImage;
                     Common::podFromHex(keyImageHex, keyImage);
 
-                    Logger::logger.log("Marking input as spent due to error: " + error, Logger::WARNING);
+                    Logger::logger.log("Marking input as spent due to error: " + error, Logger::WARNING, {});
 
                     // Usar la función de SubWallet para marcar el input como gastado
                     subWallet->markInputAsSpent(keyImage, 0);
