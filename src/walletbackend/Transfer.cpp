@@ -20,6 +20,41 @@
 namespace SendTransaction
 {
     std::tuple<Error, Crypto::Hash>
+    relayTransaction(const CryptoNote::Transaction tx, const std::shared_ptr<Nigel> daemon, const std::shared_ptr<SubWallet> subWallet)
+    {
+        const auto [success, connectionError, error] = daemon->sendTransaction(tx);
+
+        if (connectionError)
+        {
+            return {DAEMON_OFFLINE, Crypto::Hash()};
+        }
+
+        if (!success)
+        {
+            if (error.find("Transaction contains an input which has already been spent") != std::string::npos)
+            {
+                const std::string keyImagePrefix = "Key image: ";
+                const auto keyImagePos = error.find(keyImagePrefix);
+                if (keyImagePos != std::string::npos)
+                {
+                    const std::string keyImageHex = error.substr(keyImagePos + keyImagePrefix.length());
+                    Crypto::KeyImage keyImage;
+                    Common::podFromHex(keyImageHex, keyImage);
+
+                    Logger::logger.log("Marking input as spent due to error: " + error, Logger::WARNING);
+
+                    // Usar la función de SubWallet para marcar el input como gastado
+                    subWallet->markInputAsSpent(keyImage, 0);
+                }
+            }
+
+            return {Error(DAEMON_ERROR, error), Crypto::Hash()};
+        }
+
+        return {SUCCESS, getTransactionHash(tx)};
+    }
+
+    std::tuple<Error, Crypto::Hash>
         sendFusionTransactionBasic(const std::shared_ptr<Nigel> daemon, const std::shared_ptr<SubWallets> subWallets)
     {
         const auto [minMixin, maxMixin, defaultMixin] = Utilities::getMixinAllowableRange(daemon->networkBlockCount());
@@ -75,33 +110,12 @@ namespace SendTransaction
             daemon->networkBlockCount(),
             optimizeTarget
         );
-        
-        /* Filtrar inputs que ya han sido gastados */
-        ourInputs.erase(
-            std::remove_if(
-                ourInputs.begin(),
-                ourInputs.end(),
-                [&subWallets](const WalletTypes::TxInputAndOwner &input) {
-                    if (subWallets->isInputSpent(input.input.keyImage))
-                    {
-                        Logger::logger.log(
-                            "Transaction contains an input which has already been spent - Key image: " +
-                            Utilities::toHex(input.input.keyImage),
-                            Logger::ERROR
-                        );
-                        return true;
-                    }
-                    return false;
-                }
-            ),
-            ourInputs.end()
-        );
-        
-        /* Verificar si quedan suficientes inputs después de filtrar */
-        if (ourInputs.size() < CryptoNote::parameters::FUSION_TX_MIN_INPUT_COUNT)
+
+        /* Mixin is too large to get enough outputs whilst remaining in the size
+           and ratio constraints */
+        if (maxFusionInputs < CryptoNote::parameters::FUSION_TX_MIN_INPUT_COUNT)
         {
-            Logger::logger.log("Not enough inputs available for fusion transaction after filtering spent inputs.", Logger::ERROR);
-            return {FULLY_OPTIMIZED, Crypto::Hash()};
+            return {FUSION_MIXIN_TOO_LARGE, Crypto::Hash()};
         }
 
         /* Payment ID's are not needed with fusion transactions */
