@@ -75,12 +75,33 @@ namespace SendTransaction
             daemon->networkBlockCount(),
             optimizeTarget
         );
-
-        /* Mixin is too large to get enough outputs whilst remaining in the size
-           and ratio constraints */
-        if (maxFusionInputs < CryptoNote::parameters::FUSION_TX_MIN_INPUT_COUNT)
+        
+        /* Filtrar inputs que ya han sido gastados */
+        ourInputs.erase(
+            std::remove_if(
+                ourInputs.begin(),
+                ourInputs.end(),
+                [&subWallets](const WalletTypes::TxInputAndOwner &input) {
+                    if (subWallets->isInputSpent(input.input.keyImage))
+                    {
+                        Logger::logger.log(
+                            "Transaction contains an input which has already been spent - Key image: " +
+                            Utilities::toHex(input.input.keyImage),
+                            Logger::ERROR
+                        );
+                        return true;
+                    }
+                    return false;
+                }
+            ),
+            ourInputs.end()
+        );
+        
+        /* Verificar si quedan suficientes inputs después de filtrar */
+        if (ourInputs.size() < CryptoNote::parameters::FUSION_TX_MIN_INPUT_COUNT)
         {
-            return {FUSION_MIXIN_TOO_LARGE, Crypto::Hash()};
+            Logger::logger.log("Not enough inputs available for fusion transaction after filtering spent inputs.", Logger::ERROR);
+            return {FULLY_OPTIMIZED, Crypto::Hash()};
         }
 
         /* Payment ID's are not needed with fusion transactions */
