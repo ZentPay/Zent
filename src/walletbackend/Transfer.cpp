@@ -31,7 +31,7 @@ namespace SendTransaction
 
         if (!success)
         {
-            if (error.find("Transaction contains an input which has already been spent") != std::string::npos)
+            if (error.find("Transaction contains an input which has already been spent - ") != std::string::npos)
             {
                 const std::string keyImagePrefix = "Key image: ";
                 const auto keyImagePos = error.find(keyImagePrefix);
@@ -41,7 +41,7 @@ namespace SendTransaction
                     Crypto::KeyImage keyImage;
                     Common::podFromHex(keyImageHex, keyImage);
 
-                    Logger::logger.log("Marking input as spent due to error: " + error, Logger::WARNING, {});
+                    Logger::logger.log("Marking input as spent due to error: " + error, Logger::WARNING, {Logger::TRANSACTIONS});
 
                     // Usar la función de SubWallet para marcar el input como gastado
                     subWallet->markInputAsSpent(keyImage, 0);
