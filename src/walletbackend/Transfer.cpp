@@ -22,6 +22,15 @@ namespace SendTransaction
     std::tuple<Error, Crypto::Hash>
     relayTransaction(const CryptoNote::Transaction tx, const std::shared_ptr<Nigel> daemon, const std::shared_ptr<SubWallet> subWallet)
     {
+        for (const auto &input : tx.inputs)
+        {
+            if (!subWallet->haveSpendableInput(input.keyImage, daemon->networkBlockCount()))
+            {
+                Logger::logger.log("Input already spent: " + Common::podToHex(input.keyImage), Logger::WARNING, {Logger::TRANSACTIONS});
+                return {INPUT_KEYIMAGE_ALREADY_SPENT, Crypto::Hash()};
+            }
+        }
+
         const auto [success, connectionError, error] = daemon->sendTransaction(tx);
 
         if (connectionError)
@@ -40,11 +49,7 @@ namespace SendTransaction
                     const std::string keyImageHex = error.substr(keyImagePos + keyImagePrefix.length());
                     Crypto::KeyImage keyImage;
                     Common::podFromHex(keyImageHex, keyImage);
-
-                    Logger::logger.log("Marking input as spent due to error: " + error, Logger::WARNING, {Logger::TRANSACTIONS});
-
-                    // Usar la función de SubWallet para marcar el input como gastado
-                    subWallet->markInputAsSpent(keyImage, 0);
+                    subWallet->markInputAsSpent(keyImage, 0); // Marcar como gastado localmente
                 }
             }
 
